@@ -1,0 +1,1 @@
+All the tutorials here are based on youtube videos from sentdex.
