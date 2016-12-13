@@ -6,7 +6,8 @@
 
 # Trying to figure out how to get rid of the .idea folder
 # .idea
-**src/.idea/
+src/.idea/**
+.idea/**
 
 *.iml
 

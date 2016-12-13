@@ -28,6 +28,13 @@ from tensorflow.examples.tutorials.mnist import input_data # This is where we wi
 # be such that we have 10 outputs (one for each class). We need to make sure we can load all this in. For other
 # dataset we need to be smart about how to load in based on size of ram.
 mnist = input_data.read_data_sets("/home/alex/pythonCode/tensorFlowTutorials/src/tutorial_1/", one_hot=True)
+print(type(mnist))
+print(type(mnist.train.next_batch(2)))
+print(len(mnist.train.next_batch(2)))
+print(type(mnist.train.next_batch(2)[0]))
+print(type(mnist.train.next_batch(2)[1]))
+print(mnist.train.next_batch(2)[0].shape)
+print(mnist.train.next_batch(2)[1].shape)
 
 # Define number of nodes for each hidden layer
 n_nodes_hl1 = 500
