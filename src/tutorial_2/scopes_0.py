@@ -77,8 +77,18 @@ print("   v1.name = ", v1.name)
 print("   v2.name = ", v2.name)
 
 print("\nMixing variable_scope, 'Bpp', and name_scope, 'Nre', how does the variable v3 get named? How about the op x?")
+print("In this case we name the variable scope first, and then the name scope")
 with tf.variable_scope("Bpp"):
     with tf.name_scope("Nre"):
+        v3 = tf.get_variable("v", [1])
+        x = tf.add(1.0, v3)
+        print("   v3.name = ", v3.name)
+        print("   x.name = ", x.name)
+
+print("\nMixing variable_scope, 'Bpp', and name_scope, 'Nre', how does the variable v3 get named? How about the op x?")
+print("In this case we name the name scope first, and then the variable scope")
+with tf.name_scope("NRe"):
+    with tf.variable_scope("BPp"):
         v3 = tf.get_variable("v", [1])
         x = tf.add(1.0, v3)
         print("   v3.name = ", v3.name)
