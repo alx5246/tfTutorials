@@ -12,3 +12,7 @@ src/.idea/**
 *.iml
 
 .gitignore
+
+src/tutorial_3/ConvertFormat/notMNIST_conv/**
+src/tutorial_3/ConvertFormat/notMNIST_small/A/**
+
