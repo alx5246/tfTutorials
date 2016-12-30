@@ -13,6 +13,25 @@ src/.idea/**
 
 .gitignore
 
+# full_test data
+src/full_test/cifar-10-batches-bin/*
+src/full_test/trainingsum/*/
+
+# tutorial_2
+src/tutorial_2/testgraph/*
+src/tutorial_2/traingraph/*
+
+# tutorial_3/ConvertFormat
 src/tutorial_3/ConvertFormat/notMNIST_conv/**
-src/tutorial_3/ConvertFormat/notMNIST_small/A/**
+src/tutorial_3/ConvertFormat/notMNIST_small/*/*
+
+# tutorial_3/QueueReadingExamples
+src/tutorial_3/QueueReadingExamples/npDataFiles/*
+
+# tutorial_3/StandardInputPipelineExamples
+src/tutorial_3/StandardInputPipelineExamples/cifar-10-batches-bin/*
+src/tutorial_3/StandardInputPipelineExamples/unzippedData/*
+
+
+
 

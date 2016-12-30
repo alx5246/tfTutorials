@@ -1,1 +1,2 @@
-All the tutorials here are based on youtube videos from sentdex.
+All the tutorials here are based on youtube videos from sentdex. These accompanying .py files do not cover all of his
+videos. Rather, some of his videos require GPU compute, and those tutorials I do elsewhere.

@@ -3,13 +3,9 @@
 #
 # I am going to try here to take the notMNIST_small data (png) and convert to TFRecrod format! I could not find much
 # to help with this so I had to work with the code here is modified but mostly from,
-# tensorflow/models/inception/data/build_image_data.py. I will however list other referneces that helped.
+# https://github.com/tensorflow/models/blob/master/inception/inception/data/build_image_data.py. I will however list
+# other references that also helped if any.
 #
-#
-#
-
-#
-
 
 import tensorflow as tf
 import os
@@ -19,9 +15,9 @@ from datetime import datetime
 import threading
 import sys
 
+# This is tell how many threads to use and directoreis to work in. Some of this code is hardcoded.
 NUM_THREADS = 1
 OUTPUT_DIRECTOY = 'notMNIST_conv'
-
 
 def _int64_feature(value):
     """
@@ -133,7 +129,7 @@ def _process_image(filename, coder):
     # Read the image file.
     with tf.gfile.FastGFile(filename, 'r') as f:
         image_data = f.read()
-        print(type(image_data))
+        #print(type(image_data))
     # Convert any PNG to JPEG's for consistency (AJL, I may want to dumb this later)
     if '.png' in filename:
         #print('Converting PNG to JPEG for %s' % filename)
@@ -348,11 +344,12 @@ data_dir = 'notMNIST_small'
 labels_file = 'notMNIST_small_labels.txt'
 
 filenames, texts, labels = _find_image_files(data_dir, labels_file)
+print(filenames)
 name ='notMNISTdata'
-print(set(labels))
-print(set(texts))
-num_shards = 128
+#print(set(labels))
+#print(set(texts))
+#num_shards = 128
 #num_shards = 1
-_process_image_files(name, filenames, texts, labels, num_shards)
+#_process_image_files(name, filenames, texts, labels, num_shards)
 
 

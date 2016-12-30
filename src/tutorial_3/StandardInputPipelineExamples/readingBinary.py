@@ -9,6 +9,8 @@
 # 1) File that reads binary data: tensorflow/models/tutorials/image/cifar10/cifar_10.py
 # 2) A how-to by TF: https://www.tensorflow.org/how_tos/reading_data/
 # 3) Reading binary with TF example: http://stackoverflow.com/questions/33648322/tensorflow-image-reading-display
+# 4) Raeading TFRerocrds, using tf.train.shuffle_batch(), tf.Coordinator(), and tf.train.start_queue_runners
+#    https://github.com/tensorflow/tensorflow/blob/master/tensorflow/examples/how_tos/reading_data/fully_connected_reader.py
 #
 # We are have a complete pipeline for binary data.
 
@@ -90,8 +92,10 @@ def input_pipline(filenames, batch_size, numb_pre_threads):
     :return:
     """
 
-    # Generate the file-name queue from given list of filenames
-    filename_queue = tf.train.string_input_producer(filenames)
+    # Generate the file-name queue from given list of filenames. IMPORTANT, this function can read through strings
+    # indefinitely, thus you WANT to give a "num_epochs" parameter, when you reach the limit, the "OutOfRange" error
+    # will be thrown.
+    filename_queue = tf.train.string_input_producer(filenames, num_epochs=1)
     # Read the image using method defined above
     read_input = read_binary_image(filename_queue)
     # This will be the actual image

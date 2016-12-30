@@ -4,28 +4,37 @@
 # Once I have converted data to the TFRecord format I need to be able to read it!. Here I am relying on the code
 # from tensorflow/examples/how_tos/reading_date/fully_connected_reader.py
 #
-
+# However I found some other helpful documents
+# 1) Has main meth. I copied: tensorflow/examples/how_tos/reading_date/fully_connected_reader.py
+# 2) Talks abour reading images of TFR: http://stackoverflow.com/questions/35028173/how-to-read-images-with-different-size-in-a-tfrecord-file
+# 3) Reshaping loaded image from TFR: https://github.com/tensorflow/tensorflow/issues/2604
+#
 
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
-# Not yet sure how to set this?
+# There are some variables I need to set!
+# Not yet sure how to set this yet, so this number right now is a bit arbitrary
 NUMB_EXAMPLES_PER_EPOCH_FOR_TRAIN = 30
+# In order for TF loading part to work, TF needs to know the size of the images, thus I set that here.
 IMAGE_HEIGHT = 28
 IMAGE_WIDTH = 28
 
 def read_and_decode_TFR(filename_queue):
     """
     This is a modified version of read_and_decode from ...fully_connected_reader.py. NOTE: here I am assigning image
-    size on the fly, which is not good for tensorflow to build graph so I need to handle elsewhere!
+    size on the fly, which is not good for tensorflow to build graph, thus I have to give the size of the image here.
+    NOTE: I could not get this to work with just .decode_raw, I had to use the decode_jpeg.
+    NOTE: I did not unpack most of the information from teh TFrecond file, just the image, and the label
     :param filename_queue:
-    :return:
+    :return: image, label
     """
 
-    # I use the reader specific to TFRecrods
+    # I use the reader specific to TFRecrods format
     reader = tf.TFRecordReader()
     _, serialized_example = reader.read(filename_queue)
 
-    # (AJL) from orig file
+    # (AJL) from orig file....
     #features = tf.parse_single_example(serialized_example,
     #                                    # Defaults are not specified since both keys are required.
     #                                    features={
@@ -43,25 +52,22 @@ def read_and_decode_TFR(filename_queue):
                                                                      'image/filename': tf.FixedLenFeature([], tf.string),
                                                                      'image/encoded': tf.FixedLenFeature([], tf.string)} )
 
-    # The image/encodes was originally stored as string, we have to decode this into a the jpeg
+    # The image/encodes was originally stored as string, we have to decode this into a the jpeg, I could not get the
+    # decode_raw to work.
     #image = tf.image.decode_jpeg(features['image/encoded'], channels=3)
-    i_height = tf.cast(features['image/height'], tf.int64)
-    i_width = tf.cast(features['image/width'], tf.int64)
     image = tf.image.decode_jpeg(features['image/encoded'], channels=3)
-    # After this point, all image pixels reside in [0,1)
-    # until the very end, when they're rescaled to (-1, 1).  The various
-    # adjust_* ops all require this range for dtype float.
-    image = tf.image.convert_image_dtype(image, dtype=tf.float32)
-    print(type(image))
-    print(tf.shape(image))
-
+    #image = tf.decode_raw(features['image/encoded'], tf.uint8)
     height = IMAGE_HEIGHT
     width = IMAGE_WIDTH
     depth = 3
     image = tf.reshape(image, [height, width, depth])
+    image.set_shape([height, width, depth])
 
-    print(type(image))
-    print(tf.shape(image))
+    # (AJL) in the original image
+    # After this point, all image pixels reside in [0,1)
+    # until the very end, when they're rescaled to (-1, 1).  The various
+    # adjust_* ops all require this range for dtype float.
+    #image = tf.image.convert_image_dtype(image, dtype=tf.float32)
 
 
     # (AJL) from orig file
@@ -86,15 +92,18 @@ def read_and_decode_TFR(filename_queue):
 def input_pipline(filenames, batch_size, numb_pre_threads):
     """
     DESCRIPTION
-        In accordance with your typical pipelien that I have denoted, we have a seperate method that sets up the
+        In accordance with your typical pipeline that I have denoted, we have a seperate method that sets up the
         data.
-    :param filenames:
-    :param batch_size:
+    :param filenames: the list of filenames, where each file has examples (TFRecords type for the exmaples here)
+    :param batch_size: how many files in each bath
+    :param numb_pre_threads: the number of threads to use to read and decode
     :return:
     """
 
-    # Generate the file-name queue from given list of filenames
-    filename_queue = tf.train.string_input_producer(filenames)
+    # Generate the file-name queue from given list of filenames. IMPORTANT, this function can read through strings
+    # indefinitely, thus you WANT to give a "num_epochs" parameter, when you reach the limit, the "OutOfRange" error
+    # will be thrown.
+    filename_queue = tf.train.string_input_producer(filenames, num_epochs=1)
     # Read the image using method defined above
     image, label = read_and_decode_TFR(filename_queue)
 
@@ -106,21 +115,17 @@ def input_pipline(filenames, batch_size, numb_pre_threads):
     min_fraction_of_examples_in_queue = .6
     min_queue_examples = int(NUMB_EXAMPLES_PER_EPOCH_FOR_TRAIN * min_fraction_of_examples_in_queue)
     min_after_dequeue = min_queue_examples
-    print(min_after_dequeue)
     capacity = min_queue_examples + 3 * batch_size
-    print(capacity)
     images, label_batch = tf.train.shuffle_batch([image, label], batch_size=batch_size, num_threads=numb_pre_threads,
-                                                 capacity=capacity,
-                                                 min_after_dequeue=min_after_dequeue)
-
-
+                                                 capacity=capacity, min_after_dequeue=min_after_dequeue)
 
     return images, tf.reshape(label_batch, [batch_size])
 
 
 if __name__ == '__main__':
 
-    #Here we will run the test! This will test our abilities to set everything correctly!
+    # Here we will run the test! This will test our abilities to set everything correctly! In this case I will test with
+    # the data I have converted using convertPng.py.
 
     # Get file names
     filenames = ['notMNIST_conv/notMNISTdata-00000-of-00128',
@@ -148,14 +153,15 @@ if __name__ == '__main__':
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
-    for i in range(100):
+    for i in range(5):
 
         a, b = sess.run([images, labels])
         print("\n")
         print(a.shape)
+        print(type(a))
         print(b)
-
-
+        plt.imshow(a[0])
+        plt.show()
 
     # Now I have to clean up
     coord.request_stop()

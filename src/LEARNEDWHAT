@@ -1,0 +1,10 @@
+I would like to enumerate things I have found that may not be imbedded directly in the tutorials!
+
+1) For question essentailly that boils down to passing data form input pipeline to gpu/gpus. This is a good example,
+   because it talks about allocating to and from the GPUs and how to call them and CPUs.
+   "FIFOQueue: dequeue many operation very slow"
+   https://github.com/tensorflow/tensorflow/issues/3009
+
+
+2) A git repository with a huge number of examples "aymericadamien/TensorFlow-Examples". This has a bunch of good
+   examples covering a number of different topics and implementations.
